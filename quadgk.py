@@ -2,13 +2,13 @@ import numpy as np
 import warnings
 
 def quadgk(FUN,a,b,*args,**kwargs):
-    """
+    """Numerically evaluate integral, adaptive Gauss-Kronrod quadrature.
+    
     This is a translation of the quadva integration from Matlab, which is 
     based on the original code published by Lawrence F. Shampine:
     Ref: L.F. Shampine, "Vectorized Adaptive Quadrature in Matlab",
     Journal of Computational and Applied Mathematics 211, 2008, pp.131-140.
 
-    QUADGK  Numerically evaluate integral, adaptive Gauss-Kronrod quadrature.
     Q = QUADGK(FUN,A,B,*args,**kwargs) attempts to approximate the integral of
     scalar-valued function FUN from A to B using high order global adaptive
     quadrature and default error tolerances. The function Y=FUN(X) should
@@ -17,10 +17,32 @@ def quadgk(FUN,a,b,*args,**kwargs):
     can be -Inf or Inf. If both are finite, they can be complex. If at
     least one is complex, the integral is approximated over a straight line
     path from A to B in the complex plane.
+    
+    Parameters
+    ----------
+    FUN : function
+        Description of arg1
+    a : float
+        start of integral
+    b : float
+        end of integral
 
-   [Q,ERRBND] = QUADGK(...). ERRBND is an approximate upper bound on the
-   absolute error, |Q - I|, where I denotes the exact value of the
-   integral.
+    Returns
+    -------
+    Q : float
+        value of integral
+    ERRBND : float
+        ERRBND is an approximate upper bound on the
+        absolute error, |Q - I|, where I denotes the exact value of the
+        integral.
+        
+        Description of return value
+
+    Examples
+    --------
+    
+
+   [Q,ERRBND] = QUADGK(...). 
 
    [Q,ERRBND] = QUADGK(FUN,A,B,*args,**kwargs) allows for passing the additional
    parameters that FUN(x,*args) might have via the variable length arguments.
