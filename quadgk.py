@@ -1,19 +1,22 @@
-"""
-This is a shameless copy of the quadgk integration from Matlab, which is 
-based on "quadva" by Lawrence F. Shampine:
-   Ref: L.F. Shampine, "Vectorized Adaptive Quadrature in Matlab",
-   Journal of Computational and Applied Mathematics 211, 2008, pp.131-140.
-Maybe this is an copyright violation
+import numpy as np
+import warnings
 
-QUADGK  Numerically evaluate integral, adaptive Gauss-Kronrod quadrature.
+def quadgk(FUN,a,b,*args,**kwargs):
+    """
+    This is a translation of the quadva integration from Matlab, which is 
+    based on the original code published by Lawrence F. Shampine:
+    Ref: L.F. Shampine, "Vectorized Adaptive Quadrature in Matlab",
+    Journal of Computational and Applied Mathematics 211, 2008, pp.131-140.
+
+    QUADGK  Numerically evaluate integral, adaptive Gauss-Kronrod quadrature.
     Q = QUADGK(FUN,A,B,*args,**kwargs) attempts to approximate the integral of
-   scalar-valued function FUN from A to B using high order global adaptive
-   quadrature and default error tolerances. The function Y=FUN(X) should
-   accept a vector argument X and return a vector result Y, the integrand
-   evaluated at each element of X. FUN must be of type 'function'. A and B
-   can be -Inf or Inf. If both are finite, they can be complex. If at
-   least one is complex, the integral is approximated over a straight line
-   path from A to B in the complex plane.
+    scalar-valued function FUN from A to B using high order global adaptive
+    quadrature and default error tolerances. The function Y=FUN(X) should
+    accept a vector argument X and return a vector result Y, the integrand
+    evaluated at each element of X. FUN must be of type 'function'. A and B
+    can be -Inf or Inf. If both are finite, they can be complex. If at
+    least one is complex, the integral is approximated over a straight line
+    path from A to B in the complex plane.
 
    [Q,ERRBND] = QUADGK(...). ERRBND is an approximate upper bound on the
    absolute error, |Q - I|, where I denotes the exact value of the
@@ -100,11 +103,8 @@ QUADGK  Numerically evaluate integral, adaptive Gauss-Kronrod quadrature.
    Ref: L.F. Shampine, "Vectorized Adaptive Quadrature in Matlab",
    Journal of Computational and Applied Mathematics 211, 2008, pp.131-140.
 
-"""
-import numpy as np
-import warnings
+    """
 
-def quadgk(FUN,a,b,*args,**kwargs):
     global FIRSTFUNEVAL,RTOL,ATOL    
     # Args refers to the other input parameters Fun might have
     # while ** kwargs are all keyword arguments that are used
@@ -188,7 +188,7 @@ def quadgk(FUN,a,b,*args,**kwargs):
     # after the first evaluation.
     FIRSTFUNEVAL = True
 
-#--------Nested--------------------------------------    
+    #--------Nested functions--------------------------------------    
     def midpArea(f,a,b):
         # Return q = (b-a)*f((a+b)/2). Although formally correct as a low
         # order quadrature formula, this function is only used to return
@@ -203,8 +203,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             warnings.warn('quadgk:midpArea ....Infinite or Not-a-Number value encountered.');
         q = (b-a)*fx
         return q
-
-#--------More nested------------------------------------------------------------------
 
     def evalFun(x):
         # Evaluate the integrand, here the *args are used.
@@ -223,8 +221,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
                 fx = FUN(x,*args)
         return fx,too_close
 
-#--------More nested------------------------------------------------------------------
-
     def f1(t):
         # Transform to weaken singularities at both ends: [a,b] -> [-1,1]
         tt = 0.25*(B-A)*t*(3 - t**2) + 0.5*(B+A)
@@ -232,8 +228,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
         if not too_close:
             y = 0.75*(B-A)*y*(1 - t**2)
         return y,too_close
-
-#--------More nested------------------------------------------------------------------
 
     def f2(t):
         # Transform to weaken singularity at left end: [a,Inf) -> [0,Inf).
@@ -245,8 +239,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             y =  2*tt * y / (1 - t)**2
         return y,too_close
 
-#--------More nested------------------------------------------------------------------
-
     def f3(t):
         # Transform to weaken singularity at right end: (-Inf,b] -> (-Inf,b].
         # Then transform to finite interval: (-Inf,b] -> (-1,0].
@@ -257,8 +249,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             y = -2*tt * y / (1 + t)**2;
         return y,too_close
 
-#--------More nested------------------------------------------------------------------
-
     def f4(t):
         # Transform to finite interval: (-Inf,Inf) -> (-1,1).
         tt = t / (1 - t**2)
@@ -266,8 +256,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
         if not too_close:
             y = y * (1 + t**2) / (1 - t**2)**2;
         return y,too_close
-
-#--------More nested------------------------------------------------------------------
 
     def checkSpacing(x):
         ax = np.abs(x)
@@ -280,8 +268,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             warnings.warn('quadgk:CheckSpacing'
                 'Minimum step size reached near x[tcidx] singularity possible.')
         return too_close
-
-#--------More nested------------------------------------------------------------------
 
     def split(x,minsubs):
         # Split subintervals in the interval vector X so that, to working
@@ -317,8 +303,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             x = np.array([x[0],x[0]])
         return x,pathlen
 
-#--------More nested------------------------------------------------------------------
-
     def finalInputChecks(x,fx,RTOL,ATOL):
         # Do final input validation with sample input and outputs to the
         # integrand function.
@@ -338,8 +322,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
                 'RelTol was increased to 100*spacing.') 
                 #'RelTol was increased to 100*eps(''%s'') = %g.',outcls,RTOL
         return RTOL# function has no output
-
-#--------More nested-------------------------------
 
     def vadapt(f,tinterval):
         # Iterative routine to perform the integration.
@@ -407,7 +389,7 @@ def quadgk(FUN,a,b,*args,**kwargs):
             # results in too many subintervals.
             nsubs = 2*subs.shape[1]
             if nsubs > MAXINTERVALCOUNT:
-                warnings.warn('MATLAB:quadgk:MaxIntervalCountReached'
+                warnings.warn('MaxIntervalCountReached'
                     'Reached the limit on the maximum number of intervals in use.\n'
                     'Approximate bound on error is%9.1e. The integral may not exist, or\n'
                     'it may be difficult to approximate numerically. Increase MaxIntervalCount\n'
@@ -417,8 +399,6 @@ def quadgk(FUN,a,b,*args,**kwargs):
             subs = np.reshape(np.array([subs[0,:], midpt, midpt, subs[1,:]]),(2,-1),order='F')
         return q,errbnd
         
-#--------End nested--here quadgk is continued----------------------------------------------    
-
     # Handle contour integration, this acts if a,b or any of the waypoints is complex 
     if not (np.isreal(a) and np.isreal(b) and np.all(np.isreal(WAYPOINTS))):
         tinterval = np.concatenate([np.array([a]),WAYPOINTS,np.array([b])])
