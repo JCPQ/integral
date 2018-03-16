@@ -9,12 +9,12 @@ def quadgk(FUN,a,b,*args,**kwargs):
     Ref: L.F. Shampine, "Vectorized Adaptive Quadrature in Matlab",
     Journal of Computational and Applied Mathematics 211, 2008, pp.131-140.
 
-    Q = QUADGK(FUN,A,B,*args,**kwargs) attempts to approximate the integral of
+    Q = quadgk(FUN,A,B,*args,**kwargs) attempts to approximate the integral of
     scalar-valued function FUN from A to B using high order global adaptive
     quadrature and default error tolerances. The function Y=FUN(X) should
     accept a vector argument X and return a vector result Y, the integrand
     evaluated at each element of X. FUN must be of type 'function'. A and B
-    can be -Inf or Inf. If both are finite, they can be complex. If at
+    can be -np.Inf or np.Inf. If both are finite, they can be complex. If at
     least one is complex, the integral is approximated over a straight line
     path from A to B in the complex plane.
     
@@ -41,14 +41,15 @@ def quadgk(FUN,a,b,*args,**kwargs):
     Examples
     --------
     
+    note that since the code is a translation from matlab not everything
+    is entirely pythonic.
 
-   [Q,ERRBND] = QUADGK(...). 
 
-   [Q,ERRBND] = QUADGK(FUN,A,B,*args,**kwargs) allows for passing the additional
-   parameters that FUN(x,*args) might have via the variable length arguments.
+    [Q,ERRBND] = QUADGK(FUN,A,B,*args,**kwargs) allows for passing the additional
+    parameters that FUN(x,*args) might have via the variable length arguments.
    
-   [Q,ERRBND] = QUADGK(FUN,A,B,*args,**kwargs) allows for passing specific
-   keyworded arguments via kwargs. the available options are:
+    [Q,ERRBND] = QUADGK(FUN,A,B,*args,**kwargs) allows for passing specific
+    keyworded arguments via kwargs. the available options are:
        AbsTol the absolute error tolerance (f.i. AbsTol=10e-3)
        RelTol the relative error tolerance (f.i. RelTol=10e-4)
        MaxIntervalCount (f.i. MaxIntervalCount=1000)
